@@ -20,21 +20,35 @@ export function Game() {
     }
   }, [gameState]);
 
+  // Handle draw phase
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (gameState.currentPhase === 'draw') {
-      setGameState(prevState => {
-        const newState = drawCard(prevState);
-        toast({
-          title: "Card Drawn",
-          description: `Player ${newState.activePlayer + 1} drew a card`,
+      timeout = setTimeout(() => {
+        setGameState(prevState => {
+          const newState = drawCard(prevState);
+          toast({
+            title: "Card Drawn",
+            description: `Player ${newState.activePlayer + 1} drew a card`,
+          });
+          return newState;
         });
-        return newState;
-      });
+      }, 500);
     }
-  }, [gameState.currentPhase]);
+    return () => clearTimeout(timeout);
+  }, [gameState.activePlayer]);
 
   const handlePlayCard = (cardId: string) => {
-    setGameState(prevState => playCard(prevState, cardId));
+    setGameState(prevState => {
+      const newState = playCard(prevState, cardId);
+      if (newState.currentPhase === 'end') {
+        toast({
+          title: "Card Effect Resolved",
+          description: `Moving to end phase`,
+        });
+      }
+      return newState;
+    });
   };
 
   const handleEndTurn = () => {

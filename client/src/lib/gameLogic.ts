@@ -73,6 +73,43 @@ export const drawCard = (state: GameState): GameState => {
   return newState;
 };
 
+const resolveCardEffect = (state: GameState, card: Card): GameState => {
+  const newState = { ...state };
+  const activePlayer = newState.players[newState.activePlayer];
+  const opponent = newState.players[(newState.activePlayer + 1) % 2];
+  
+  // Determine effect based on metrics
+  const damageMetric = card.metrics.find(m => m.type === 'damage');
+  const riskMetric = card.metrics.find(m => m.type === 'risk');
+  
+  let damage = 0;
+  let healing = 0;
+  
+  // Calculate damage based on metrics
+  if (damageMetric?.value === 'Destructive') {
+    damage = 5 * newState.context.effects.damageModifier;
+  } else if (damageMetric?.value === 'Harmful') {
+    damage = 3 * newState.context.effects.damageModifier;
+  }
+  
+  // Apply risk modifier
+  if (riskMetric?.value === 'Volatile') {
+    damage *= 1.5;
+    healing *= 0.5;
+  } else if (riskMetric?.value === 'Safe') {
+    damage *= 0.7;
+    healing *= 1.3;
+  }
+  
+  // Apply effects
+  opponent.lifePoints = Math.max(0, opponent.lifePoints - Math.floor(damage));
+  activePlayer.lifePoints = Math.min(20, activePlayer.lifePoints + Math.floor(healing));
+  
+  // Move to end phase
+  newState.currentPhase = 'end';
+  return newState;
+};
+
 export const playCard = (state: GameState, cardId: string): GameState => {
   const newState = { ...state };
   const activePlayer = newState.players[newState.activePlayer];
@@ -84,8 +121,11 @@ export const playCard = (state: GameState, cardId: string): GameState => {
   activePlayer.hand.splice(cardIndex, 1);
   card.revealed = true;
   
+  // Enter resolution phase
   newState.currentPhase = 'resolution';
-  return newState;
+  
+  // Automatically resolve effect and move to end phase
+  return resolveCardEffect(newState, card);
 };
 
 export const endTurn = (state: GameState): GameState => {
