@@ -22,7 +22,7 @@ const contexts: GameContext[] = [
 ];
 
 const generateCard = (id: string): Card => {
-  const metrics = [
+  const metrics: [CardMetric, CardMetric] = [
     { type: 'damage', value: ['Harmful', 'Destructive', 'Peaceful'][Math.floor(Math.random() * 3)] },
     { type: 'risk', value: ['Safe', 'Risky', 'Volatile'][Math.floor(Math.random() * 3)] }
   ];
@@ -30,7 +30,7 @@ const generateCard = (id: string): Card => {
   return {
     id,
     title: `Card ${id}`,
-    metrics: metrics as [typeof metrics[0], typeof metrics[1]],
+    metrics,
     revealed: false
   };
 };
