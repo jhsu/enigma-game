@@ -20,15 +20,25 @@ export function Game() {
     }
   }, [gameState]);
 
+  useEffect(() => {
+    if (gameState.currentPhase === 'draw') {
+      setGameState(prevState => {
+        const newState = drawCard(prevState);
+        toast({
+          title: "Card Drawn",
+          description: `Player ${newState.activePlayer + 1} drew a card`,
+        });
+        return newState;
+      });
+    }
+  }, [gameState.currentPhase]);
+
   const handlePlayCard = (cardId: string) => {
     setGameState(prevState => playCard(prevState, cardId));
   };
 
   const handleEndTurn = () => {
-    setGameState(prevState => {
-      let newState = endTurn(prevState);
-      return drawCard(newState);
-    });
+    setGameState(prevState => endTurn(prevState));
   };
 
   const handleExit = () => {

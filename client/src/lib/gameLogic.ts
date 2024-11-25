@@ -64,9 +64,11 @@ export const drawCard = (state: GameState): GameState => {
   const activePlayer = newState.players[newState.activePlayer];
   
   if (activePlayer.hand.length < MAX_HAND_SIZE) {
-    activePlayer.hand.push(generateCard(`${Math.random()}`));
+    const newCard = generateCard(`${Math.random()}`);
+    activePlayer.hand.push(newCard);
   }
   
+  // Always advance to main phase after drawing
   newState.currentPhase = 'main';
   return newState;
 };
