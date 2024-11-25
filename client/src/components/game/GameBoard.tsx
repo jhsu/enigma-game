@@ -51,9 +51,19 @@ export function GameBoard({ gameState, onPlayCard, onEndTurn }: GameBoardProps) 
 
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="flex flex-col items-center gap-4">
-            <PhaseIndicator phase={gameState.currentPhase} />
+            <div className="flex flex-col items-center gap-2">
+              <PhaseIndicator phase={gameState.currentPhase} />
+              <p className="text-sm text-muted-foreground">
+                Player {gameState.activePlayer + 1}'s Turn
+              </p>
+            </div>
             {gameState.currentPhase === 'main' && (
-              <Button onClick={onEndTurn}>End Turn</Button>
+              <Button 
+                onClick={onEndTurn}
+                className="animate-pulse"
+              >
+                End Turn
+              </Button>
             )}
           </div>
         </div>

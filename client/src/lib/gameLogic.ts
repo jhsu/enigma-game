@@ -1,4 +1,4 @@
-import { GameState, Card, GameContext, Player } from '@/types/game';
+import { GameState, Card, GameContext, Player, CardMetric } from '@/types/game';
 
 const STARTING_LIFE = 20;
 const MAX_HAND_SIZE = 5;

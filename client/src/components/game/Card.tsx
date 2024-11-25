@@ -12,9 +12,11 @@ export function Card({ card, onClick, disabled }: CardProps) {
   return (
     <ShadcnCard
       className={cn(
-        "w-[200px] h-[280px] p-4 cursor-pointer transition-all hover:scale-105",
+        "w-[200px] h-[280px] p-4 transition-all relative",
+        !disabled && "hover:scale-105 hover:border-primary hover:shadow-lg cursor-pointer",
         disabled && "opacity-50 cursor-not-allowed",
-        "bg-card border-2 border-primary/20"
+        "bg-card border-2",
+        !disabled ? "border-primary/40" : "border-primary/20"
       )}
       onClick={() => !disabled && onClick?.()}
     >
