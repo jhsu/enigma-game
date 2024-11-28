@@ -33,4 +33,6 @@ export type GameState = {
   currentPhase: GamePhase;
   context: GameContext;
   gameOver: boolean;
+  playedCards: Card[];
+  lastPlayedCard?: Card;
 };

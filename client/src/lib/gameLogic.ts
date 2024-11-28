@@ -55,7 +55,9 @@ export const initializeGame = (): GameState => {
     activePlayer: 0,
     currentPhase: 'draw',
     context: contexts[0],
-    gameOver: false
+    gameOver: false,
+    playedCards: [],
+    lastPlayedCard: undefined
   };
 };
 
@@ -121,15 +123,22 @@ export const playCard = (state: GameState, cardId: string): GameState => {
   activePlayer.hand.splice(cardIndex, 1);
   card.revealed = true;
   
-  // Enter resolution phase
-  newState.currentPhase = 'resolution';
+  // Add card to played cards
+  newState.playedCards = [...newState.playedCards, card];
+  newState.lastPlayedCard = card;
   
-  // Automatically resolve effect and move to end phase
-  return resolveCardEffect(newState, card);
+  // Enter resolution phase and resolve effect
+  newState.currentPhase = 'resolution';
+  const resolvedState = resolveCardEffect(newState, card);
+  
+  // Move to end phase after resolution
+  resolvedState.currentPhase = 'end';
+  return resolvedState;
 };
 
 export const endTurn = (state: GameState): GameState => {
   const newState = { ...state };
+  // Switch to next player and start their draw phase
   newState.activePlayer = (newState.activePlayer + 1) % 2;
   newState.currentPhase = 'draw';
   return newState;

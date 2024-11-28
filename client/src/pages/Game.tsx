@@ -7,6 +7,7 @@ import { useLocation } from 'wouter';
 
 export function Game() {
   const [gameState, setGameState] = useState(initializeGame());
+  const [logs, setLogs] = useState<string[]>([]);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -17,6 +18,7 @@ export function Game() {
         title: "Game Over!",
         description: `Player ${winner} wins!`,
       });
+      setLogs(prev => [...prev, `Game Over! Player ${winner} wins!`]);
     }
   }, [gameState]);
 
@@ -31,6 +33,7 @@ export function Game() {
             title: "Card Drawn",
             description: `Player ${newState.activePlayer + 1} drew a card`,
           });
+          setLogs(prev => [...prev, `Player ${newState.activePlayer + 1} drew a card`]);
           return newState;
         });
       }, 500);
@@ -40,19 +43,31 @@ export function Game() {
 
   const handlePlayCard = (cardId: string) => {
     setGameState(prevState => {
+      const card = prevState.players[prevState.activePlayer].hand.find(c => c.id === cardId);
       const newState = playCard(prevState, cardId);
+      setLogs(prev => [...prev, `Player ${prevState.activePlayer + 1} played ${card?.title}`]);
+      
+      // Log the effect of the card
+      const damageMetric = card?.metrics.find(m => m.type === 'damage');
+      const riskMetric = card?.metrics.find(m => m.type === 'risk');
+      setLogs(prev => [...prev, `Card Effect: ${damageMetric?.value} and ${riskMetric?.value}`]);
+      
       if (newState.currentPhase === 'end') {
         toast({
           title: "Card Effect Resolved",
           description: `Moving to end phase`,
         });
+        setLogs(prev => [...prev, 'Moving to end phase']);
       }
       return newState;
     });
   };
 
   const handleEndTurn = () => {
-    setGameState(prevState => endTurn(prevState));
+    setGameState(prevState => {
+      setLogs(prev => [...prev, `Player ${prevState.activePlayer + 1} ended their turn`]);
+      return endTurn(prevState);
+    });
   };
 
   const handleExit = () => {
@@ -68,6 +83,7 @@ export function Game() {
         gameState={gameState}
         onPlayCard={handlePlayCard}
         onEndTurn={handleEndTurn}
+        logs={logs}
       />
     </div>
   );
